@@ -48,15 +48,6 @@ class Repository implements RepositoryInterface
             ->find($id);
     }
 
-    function findOrCreate(string|int $id, array $attributes = []): EntryInterface
-    {
-        if ($entry = $this->find($id)) {
-            return $entry;
-        }
-
-        return $this->create($attributes);
-    }
-
     public function findAll(array $ids): Collection
     {
         $keyName = $this->stream->config('key_name', 'id');

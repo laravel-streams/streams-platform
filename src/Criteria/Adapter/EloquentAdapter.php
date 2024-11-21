@@ -94,7 +94,14 @@ class EloquentAdapter extends AbstractAdapter
 
     public function groupBy(...$groups): static
     {
-        $this->query = $this->query->groupBy(...$groups);
+        $this->query->groupBy(...$groups);
+
+        return $this;
+    }
+
+    public function join($stream, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+    {
+        $this->query->join($stream, $first, $operator, $second, $type, $where);
 
         return $this;
     }

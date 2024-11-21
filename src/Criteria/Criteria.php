@@ -65,6 +65,17 @@ class Criteria
         return $this->get()->first();
     }
 
+    public function firstOrCreate(array $attributes, array $values = null)
+    {
+        foreach ($attributes as $attribute => $value) {
+            $this->where($attribute, $value);
+        }
+
+        $result = $this->first();
+
+        return $result ?: $this->create($values ?: $attributes);
+    }
+
     public function cache(int $seconds = null, string $key = null)
     {
         $seconds = $seconds ?: $this->stream->config('cache.ttl', 60 * 60);
