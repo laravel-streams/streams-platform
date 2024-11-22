@@ -65,15 +65,11 @@ class Criteria
         return $this->get()->first();
     }
 
-    public function firstOrCreate(array $attributes, array $values = null)
+    public function firstOrCreate(array $attributes)
     {
-        foreach ($attributes as $attribute => $value) {
-            $this->where($attribute, $value);
-        }
-
         $result = $this->first();
 
-        return $result ?: $this->create($values ?: $attributes);
+        return $result ?: $this->create($attributes);
     }
 
     public function cache(int $seconds = null, string $key = null)
