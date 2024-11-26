@@ -394,7 +394,7 @@ class Criteria
             return $this->callMacroable($method, $arguments);
         }
 
-        $this->parameters[$method][md5(serialize($arguments))] = $arguments;
+        $this->parameters[$method][md5(json_encode($arguments))] = $arguments;
 
         return $this;
     }

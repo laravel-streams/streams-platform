@@ -166,4 +166,11 @@ class EloquentAdapter extends AbstractAdapter
 
         return $model;
     }
+
+    public function __call($method, $arguments = [])
+    {
+        $this->query = $this->query->$method(...$arguments);
+        
+        return $this;
+    }
 }
