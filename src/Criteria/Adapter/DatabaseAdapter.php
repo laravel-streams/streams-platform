@@ -125,7 +125,7 @@ class DatabaseAdapter extends AbstractAdapter
         
         if ($id && $this->query->exists()) {
             return $this->query->update($attributes);
-        } else {
+        } elseif ($keyName === false) {
             return $this->query->insert($attributes);
         }
 
