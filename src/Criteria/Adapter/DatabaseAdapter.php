@@ -122,9 +122,11 @@ class DatabaseAdapter extends AbstractAdapter
         if ($id) {
             $this->query->where($keyName, $id);
         }
-
-        if ($this->query->exists()) {
+        
+        if ($id && $this->query->exists()) {
             return $this->query->update($attributes);
+        } elseif ($keyName === false) {
+            return $this->query->insert($attributes);
         }
 
         foreach ($attributes as &$value) {

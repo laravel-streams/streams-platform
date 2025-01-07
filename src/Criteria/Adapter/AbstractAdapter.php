@@ -25,6 +25,11 @@ abstract class AbstractAdapter implements AdapterInterface
 
     protected Stream $stream;
 
+    public function getQuery()
+    {
+        return $this->query;
+    }
+
     abstract public function orderBy($field, $direction = 'asc'): static;
 
     abstract public function limit($limit, $offset = 0): static;
