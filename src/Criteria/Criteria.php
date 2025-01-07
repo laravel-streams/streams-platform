@@ -208,7 +208,7 @@ class Criteria
 
         $count =  $this->adapter->count($this->parameters);
 
-        $this->parameters = [];
+        // $this->parameters = [];
 
         return $count;
     }
