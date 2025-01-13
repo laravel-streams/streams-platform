@@ -77,7 +77,7 @@ class EloquentAdapter extends AbstractAdapter
 
         return $this;
     }
-    
+
     public function whereJsonLength($column, $operator, $value = null, $boolean = 'and')
     {
         $this->query->whereJsonLength($column, $operator, $value, $boolean);
@@ -151,6 +151,11 @@ class EloquentAdapter extends AbstractAdapter
         $this->query->truncate();
     }
 
+    public function toRawSql(): string
+    {
+        return $this->query->toRawSql();
+    }
+
     protected function make($entry): EntryInterface
     {
         return $entry;
@@ -170,7 +175,7 @@ class EloquentAdapter extends AbstractAdapter
     public function __call($method, $arguments = [])
     {
         $this->query = $this->query->$method(...$arguments);
-        
+
         return $this;
     }
 }

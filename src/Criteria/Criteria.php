@@ -394,6 +394,10 @@ class Criteria
             return $this->callMacroable($method, $arguments);
         }
 
+        if (method_exists($this->adapter, $method)) {
+            return $this->adapter->$method(...$arguments);
+        }
+
         $this->parameters[$method][md5(json_encode($arguments))] = $arguments;
 
         return $this;
