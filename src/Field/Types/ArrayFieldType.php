@@ -18,7 +18,7 @@ class ArrayFieldType extends Field
     public $rules = [
         'array',
         'nullable',
-        'valid_items' => ValidateArrayItems::class,
+        // 'valid_items' => ValidateArrayItems::class,
     ];
 
     public function cast($value)
