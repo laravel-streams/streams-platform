@@ -129,8 +129,11 @@ class DatabaseAdapter extends AbstractAdapter
                 $value = json_encode($value);
             }
 
-            if (is_object($value)) {
-                $value = json_encode($value);
+            if (
+                is_object($value) &&
+                ($json = json_encode($value)) !== '{}'
+            ) {
+                $value = $json;
             }
         }
         
