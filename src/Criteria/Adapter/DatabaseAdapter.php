@@ -122,17 +122,22 @@ class DatabaseAdapter extends AbstractAdapter
         if ($id) {
             $this->query->where($keyName, $id);
         }
+
+        foreach ($attributes as &$value) {
+            
+            if (is_array($value)) {
+                $value = json_encode($value);
+            }
+
+            if (is_object($value)) {
+                $value = json_encode($value);
+            }
+        }
         
         if ($id && $this->query->exists()) {
             return $this->query->update($attributes);
         } elseif ($keyName === false) {
             return $this->query->insert($attributes);
-        }
-
-        foreach ($attributes as &$value) {
-            if (is_array($value)) {
-                $value = json_encode($value);
-            }
         }
 
         $id = $this->query->insertGetId($attributes);
