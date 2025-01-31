@@ -63,12 +63,12 @@ interface AdapterInterface
     public function count();
 
     /**
-     * Save an entry.
+     * Save attributes to the database.
      *
-     * @param  EntryInterface $entry
-     * @return bool
+     * @param  array $attributes
+     * @return array of saved attributes
      */
-    public function save(EntryInterface $entry);
+    public function save(array $attributes): array;
 
     /**
      * Delete an entry.

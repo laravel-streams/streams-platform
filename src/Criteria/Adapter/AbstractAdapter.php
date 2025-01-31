@@ -47,7 +47,7 @@ abstract class AbstractAdapter implements AdapterInterface
 
     abstract public function delete(array $parameters = []): bool;
 
-    abstract public function save(EntryInterface $entry): bool;
+    abstract public function save(array $attributes): array;
 
     abstract public function truncate(): void;
 
