@@ -68,7 +68,6 @@ class StreamsServiceProvider extends ServiceProvider
 
         $this->registerAliases();
         $this->registerMacros();
-        $this->extendView();
         $this->extendApp();
 
         $this->publishes([
@@ -282,15 +281,6 @@ class StreamsServiceProvider extends ServiceProvider
     {
         // @todo core or streams
         Lang::addNamespace('streams', dirname(__DIR__) . '/resources/lang');
-    }
-
-    protected function extendView(): void
-    {
-        View::composer('*', function ($view) {
-            if ($override = Overrides::get($view->name())) {
-                $view->setPath(base_path($override));
-            }
-        });
     }
 
     protected function registerMacros(): void
