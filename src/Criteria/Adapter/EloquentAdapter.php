@@ -134,9 +134,15 @@ class EloquentAdapter extends AbstractAdapter
         return $this->query->count();
     }
 
-    public function save($entry): bool
+    public function save(array $attributes): array
     {
-        return $entry->save();
+        $model = $this->stream->config('source.model');
+
+        $model = new $model($attributes);
+
+        $model->save();
+
+        return $model->getAttributes();
     }
 
     public function delete(array $parameters = []): bool

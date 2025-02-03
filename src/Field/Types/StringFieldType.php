@@ -19,6 +19,16 @@ class StringFieldType extends Field
         return (string) $value;
     }
 
+    public function default($value)
+    {
+        if ($value == 'random') {
+            
+            $length = $this->ruleParameter('min', 40);
+
+            return Str::random($length);
+        }
+    }
+
     public function modify($value)
     {
         return $this->cast($value);

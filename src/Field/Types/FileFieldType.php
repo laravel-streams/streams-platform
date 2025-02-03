@@ -8,6 +8,10 @@ use Streams\Core\Field\Decorator\FileDecorator;
 
 class FileFieldType extends Field
 {
+    public $rules = [
+        'nullable',
+    ];
+
     public function cast($value)
     {
         if (is_string($value)) {

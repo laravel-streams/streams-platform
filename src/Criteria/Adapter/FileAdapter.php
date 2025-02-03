@@ -84,10 +84,8 @@ class FileAdapter extends AbstractAdapter
         return $this->get($parameters)->count();
     }
 
-    public function save($entry): bool
+    public function save(array $attributes): array
     {
-        $attributes = $entry->getAttributes();
-
         $keyName = $this->stream->config('key_name', 'id');
 
         $key = Arr::get($attributes, $keyName);
@@ -107,7 +105,9 @@ class FileAdapter extends AbstractAdapter
             $this->data[$key] = $attributes;
         }
 
-        return $this->writeData();
+        $this->writeData();
+
+        return $attributes;
     }
 
     public function delete(array $parameters = []): bool

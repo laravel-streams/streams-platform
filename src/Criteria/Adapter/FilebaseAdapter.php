@@ -104,10 +104,8 @@ class FilebaseAdapter extends AbstractAdapter
         return $this->query->count();
     }
 
-    public function save($entry): bool
+    public function save(array $attributes): array
     {
-        $attributes = $entry->getAttributes();
-        
         $keyName = $this->stream->config('key_name', 'id');
 
         /**
@@ -119,9 +117,11 @@ class FilebaseAdapter extends AbstractAdapter
         Arr::pull($attributes, 'created_at');
         Arr::pull($attributes, 'updated_at');
 
-        return (bool) $this->query
-            ->get($entry->{$keyName})
+        $this->query
+            ->get($attributes[$keyName])
             ->save($attributes);
+
+        return $attributes;
     }
 
     public function delete(array $parameters = []): bool

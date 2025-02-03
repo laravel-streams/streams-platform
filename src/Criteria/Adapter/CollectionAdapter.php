@@ -92,10 +92,8 @@ class CollectionAdapter extends AbstractAdapter
         return $this->get($parameters)->count();
     }
 
-    public function save(EntryInterface $entry): bool
+    public function save(array $attributes): array
     {
-        $attributes = $entry->getAttributes();
-
         $keyName = $this->stream->config('key_name', 'id');
 
         $key = Arr::get($attributes, $keyName);
@@ -106,7 +104,7 @@ class CollectionAdapter extends AbstractAdapter
 
         $this->data[$key] = array_merge($fields, $attributes);
         
-        return true;
+        return $attributes;
     }
 
     public function delete(array $parameters = []): bool

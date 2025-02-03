@@ -111,10 +111,8 @@ class DatabaseAdapter extends AbstractAdapter
         return $count;
     }
 
-    public function save($entry): bool
+    public function save(array $attributes): array
     {
-        $attributes = $entry->getAttributes();
-
         $keyName = $this->stream->config('key_name', 'id');
 
         $id = Arr::get($attributes, $keyName);
@@ -124,22 +122,22 @@ class DatabaseAdapter extends AbstractAdapter
         }
         
         if ($id && $this->query->exists()) {
-            return $this->query->update($attributes);
-        } elseif ($keyName === false) {
-            return $this->query->insert($attributes);
-        }
+            
+            $this->query->update($attributes);
 
-        foreach ($attributes as &$value) {
-            if (is_array($value)) {
-                $value = json_encode($value);
-            }
+            return $attributes;
+        } elseif ($keyName === false) {
+            
+            $this->query->insert($attributes);
+
+            return $attributes;
         }
 
         $id = $this->query->insertGetId($attributes);
 
-        $entry->{$keyName} = $id;
+        $attributes[$keyName] = $id;
 
-        return true;
+        return $attributes;
     }
 
     public function delete(array $parameters = []): bool

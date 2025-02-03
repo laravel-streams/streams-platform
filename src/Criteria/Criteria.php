@@ -240,13 +240,40 @@ class Criteria
             'entry' => $entry,
         ]);
 
-        $result = $this->adapter->save($entry);
+        $attributes = $entry->getAttributes();
+
+        /**
+         * Format the fields for storage.
+         */
+        foreach ($this->stream->fields as $field) {
+
+            if (array_key_exists($field->handle, $attributes) && !is_null($attributes[$field->handle])) {
+                $attributes[$field->handle] = $field->modify($attributes[$field->handle]);
+            }
+
+            if (
+                !array_key_exists($field->handle, $attributes)
+                && !is_null($default = $field->config('default'))
+            ) {
+                $attributes[$field->handle] = $field->default($default);
+            }
+        }
+
+        foreach ($attributes as &$value) {
+            if (is_array($value)) {
+                $value = json_encode($value);
+            }
+        }
+
+        $savedAttributes = $this->adapter->save($attributes);
+
+        $entry->setAttributes($savedAttributes);
 
         $entry->fire('saved', [
             'entry' => $entry,
         ]);
 
-        return (bool) $result;
+        return $entry;
     }
 
     public function delete(): bool
