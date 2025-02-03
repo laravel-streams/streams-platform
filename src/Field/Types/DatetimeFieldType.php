@@ -2,7 +2,6 @@
 
 namespace Streams\Core\Field\Types;
 
-use Carbon\Carbon;
 use Streams\Core\Field\Field;
 use Illuminate\Support\Facades\Date;
 use Streams\Core\Field\Schema\DatetimeSchema;
@@ -22,24 +21,28 @@ class DatetimeFieldType extends Field
 
     public function default($value)
     {
-        return $this->toCarbon($value);
+        return $this->toDateTime($value);
     }
 
-    public function cast($value): \Datetime | null
+    public function cast($value): \DateTime | null
     {
-        return $this->toCarbon($value);
+        $timezone = $this->config('timezone', config('app.timezone'));
+        
+        return $this->toDateTime($value, $timezone);
     }
 
     public function modify($value)
     {
         $format = $this->config('format', 'Y-m-d H:i:s');
 
-        return $this->toCarbon($value)?->format($format);
+        return $this->toDateTime($value)?->setTimezone('UTC')->format($format);
     }
 
-    public function restore($value): \Datetime
+    public function restore($value): \DateTime
     {
-        return $this->cast($value);
+        $timezone = $this->config('timezone', config('app.timezone'));
+
+        return $this->toDateTime($value, 'UTC')->setTimezone($timezone);
     }
 
     public function getSchemaName()
@@ -68,27 +71,22 @@ class DatetimeFieldType extends Field
         };
     }
 
-    protected function toCarbon($value): Carbon | null
+    protected function toDateTime($value, string $timezone = null): \DateTime | null
     {
+        if ($value instanceof \DateTime) {
+            return $value;
+        }
+
         if (!$value) {
             return null;
         }
-        
-        if ($value instanceof Carbon) {
-            return Date::instance($value);
-        }
 
-        if ($value instanceof \Datetime) {
-            return Date::parse(
-                $value->format($this->config('format')),
-                $value->getTimezone()
-            );
-        }
+        $timezone = $timezone ?: $this->config('timezone', config('app.timezone'));
 
         if (is_numeric($value)) {
-            return Date::createFromTimestamp($value);
+            return Date::createFromTimestamp($value, $timezone);
         }
 
-        return Date::parse($value);
+        return Date::parse($value, $timezone);
     }
 }

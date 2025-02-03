@@ -44,7 +44,15 @@ class ObjectFieldType extends Field
 
     public function restore($value): object
     {
-        [$meta, $value] = $this->separateMeta((array) $value);
+        if (is_object($value)) {
+            return $value;
+        }
+        
+        if (is_string($value)) {
+            $value = json_decode($value, true);
+        }
+
+        [$meta, $value] = $this->separateMeta($value);
 
         if (isset($meta['@stream'])) {
             return $this->restoreEntry($meta, $value);

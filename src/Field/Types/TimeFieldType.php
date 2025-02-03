@@ -23,12 +23,14 @@ class TimeFieldType extends DatetimeFieldType
     {
         $format = $this->config('format', 'H:i:s');
 
-        return $this->toCarbon($value)->format($format);
+        return $this->toDateTime($value)->format($format);
     }
 
     public function restore($value): Carbon
     {
-        return $this->cast($value);
+        $timezone = $this->config('timezone', config('app.timezone'));
+
+        return $this->cast($value, 'UTC')->setTimezone($timezone);
     }
 
     public function generator()

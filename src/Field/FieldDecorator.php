@@ -40,4 +40,9 @@ class FieldDecorator
     {
         return $this->forwardCallTo($this->value, $method, $parameters);
     }
+
+    public function __get($property)
+    {
+        return $this->value->{$property};
+    }
 }

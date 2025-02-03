@@ -19,21 +19,21 @@ class DateFieldType extends DatetimeFieldType
         'format' => 'Y-m-d',
     ];
 
-    public function default($value): \Datetime
+    public function default($value): \DateTime
     {
         return $this->cast($value);
     }
 
-    public function cast($value): \Datetime | null
+    public function cast($value): \DateTime | null
     {
-        return $this->toCarbon($value)?->startOfDay();
+        return $this->toDateTime($value, 'UTC')?->startOfDay();
     }
 
     public function modify($value)
     {
         $format = $this->config('format', 'Y-m-d');
 
-        return $this->toCarbon($value)?->format($format);
+        return $this->toDateTime($value)?->format($format);
     }
 
     public function getSchemaName()
@@ -62,21 +62,14 @@ class DateFieldType extends DatetimeFieldType
         };
     }
 
-    protected function toCarbon($value): Carbon | null
+    protected function toDateTime($value, string $timezone = null): \DateTime | null
     {
-        if (!$value) {
-            return null;
-        }
-
-        if ($value instanceof Carbon) {
+        if ($value instanceof \DateTime) {
             return $value;
         }
 
-        if ($value instanceof \Datetime) {
-            return Carbon::parse(
-                $value->format('Y-m-d H:i:s'),
-                $value->getTimezone()
-            );
+        if (!$value) {
+            return null;
         }
 
         if (is_string($value) && $this->isStandardDateFormat($value)) {

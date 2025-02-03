@@ -87,13 +87,22 @@ abstract class AbstractAdapter implements AdapterInterface
             'stream' => $this->stream,
         ]);
         
+        foreach ($attributes as $key => &$value) {
+            
+            if (!$field = $this->stream->fields->get($key)) {
+                continue;
+            }
+
+            $value = is_null($value) ? $value : $field->restore($value);
+        }
+
         // $prototype->setPrototypeProperties(
         //     Arr::keyBy($this->stream->getOriginalPrototypeAttributes()['fields'], 'handle')
         // );
         
         $this->fillDefaults($attributes);
         
-        $prototype->setPrototypeAttributes($attributes);
+        $prototype->setRawPrototypeAttributes($attributes);
 
         return $prototype;
     }
@@ -135,15 +144,6 @@ abstract class AbstractAdapter implements AdapterInterface
         $entry = new $prototype([
             'stream' => $this->stream,
         ]);
-
-        foreach ($data as $key => &$value) {
-            
-            if (!$field = $this->stream->fields->get($key)) {
-                continue;
-            }
-
-            $value = is_null($value) ? $value : $field->restore($value);
-        }
 
         $entry = $entry->setRawPrototypeAttributes($data);
         
