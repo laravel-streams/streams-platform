@@ -3,6 +3,7 @@
 namespace Streams\Core\Criteria;
 
 use Illuminate\Support\Arr;
+use Streams\Core\Entry\Entry;
 use Streams\Core\Stream\Stream;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Request;
@@ -139,21 +140,75 @@ class Criteria
             $seconds = $cache[0];
             $key = Arr::get($cache, 1);
 
-            return $this->stream->cache()->remember($key ?: $fingerprint, $seconds, function () {
+            return $this->collect($this->stream->cache()->remember($key ?: $fingerprint, $seconds, function () {
                 
-                $results = $this->eagerLoadRelations($this->adapter->get($this->parameters));
+                $results = $this->eagerLoadRelations($this->collect($this->adapter->get($this->parameters)));
 
                 $this->parameters = [];
 
                 return $results;
-            });
+            }));
         }
 
-        $results = $this->eagerLoadRelations($this->adapter->get($this->parameters));
+        $results = $this->eagerLoadRelations($this->collect($this->adapter->get($this->parameters)));
 
         $this->parameters = [];
 
         return $results;
+    }
+
+    protected function collect($entries): Collection
+    {
+        if ($entries instanceof Collection) {
+            $entries = $entries->all();
+        }
+
+        $collection = $this->stream
+            ->repository()
+            ->newCollection();
+
+        array_map(function ($entry) use ($collection) {
+            $entry = $this->make($entry);
+            // @todo this is where all entries get stream info.
+            // Maybe we do like __stream to prevent collision 
+            //$entry->stream = $this->stream;
+            $collection->push($entry);
+        }, $entries);
+
+        return $collection;
+    }
+
+    /**
+     * Return an entry interface from adapter results.
+     *
+     * @param mixed $result
+     * @return array
+     */
+    protected function make($result): EntryInterface
+    {
+        if ($result instanceof EntryInterface) {
+            return $result;
+        }
+
+        if (is_object($result) && method_exists($result, 'toArray')) {
+            $data = $result->toArray();
+        } else {
+            $data = (array) $result;
+        }
+
+        if (is_object($result) && method_exists($result, 'getId')) {
+            $data['id'] = $result->getId();
+        }
+
+        $data = Arr::undot($data);
+        
+        $keyName = $this->stream->config('key_name', 'id');
+
+        if ($id = $data[$keyName] ?? null)  {
+            $data = array_merge([$keyName => $id], $data);
+        }
+
+        return $this->newInstance($data);
     }
 
     public function chunk(int $count, callable $callback): bool
@@ -400,7 +455,31 @@ class Criteria
 
     public function newInstance(array $attributes = [])
     {
-        return $this->adapter->newInstance($attributes);
+        $abstract = $this->stream->config('abstract', Entry::class);
+
+        $prototype = new $abstract([
+            'stream' => $this->stream,
+        ]);
+        
+        foreach ($attributes as $key => &$value) {
+            
+            if (!$field = $this->stream->fields->get($key)) {
+                continue;
+            }
+
+            $value = is_null($value) ? $value : $field->restore($value);
+        }
+
+        // $prototype->setPrototypeProperties(
+        //     Arr::keyBy($this->stream->getOriginalPrototypeAttributes()['fields'], 'handle')
+        // );
+        
+        $this->fillDefaults($attributes);
+        
+        // $prototype->setRawPrototypeAttributes($attributes);
+        $prototype->setAttributes($attributes);
+
+        return $prototype;
     }
 
     public function getParameters()
@@ -413,6 +492,22 @@ class Criteria
         $this->parameters = $parameters;
 
         return $this;
+    }
+
+    protected function fillDefaults(array &$attributes): void
+    {
+        foreach ($this->stream->fields as $field) {
+
+            if (!$default = $field->config('default')) {
+                continue;
+            }
+
+            if (array_key_exists($field->handle, $attributes)) {
+                continue;
+            }
+
+            $attributes[$field->handle] = is_null($default) ? null : $field->default($default);
+        }
     }
 
     public function __call($method, $arguments = [])

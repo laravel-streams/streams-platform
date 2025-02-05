@@ -12,12 +12,6 @@ use Illuminate\Support\Facades\Config;
 
 class FilebaseAdapter extends AbstractAdapter
 {
-
-    /**
-     * The database query.
-     *
-     * @var Database|Query
-     */
     protected $query;
 
     public function __construct(Stream $stream)
@@ -90,11 +84,11 @@ class FilebaseAdapter extends AbstractAdapter
         return $this;
     }
 
-    public function get(array $parameters = []): Collection
+    public function get(array $parameters = []): array
     {
         $this->callParameterMethods($parameters);
 
-        return $this->collect($this->query->resultDocuments());
+        return $this->query->resultDocuments();
     }
 
     public function count(array $parameters = []): int

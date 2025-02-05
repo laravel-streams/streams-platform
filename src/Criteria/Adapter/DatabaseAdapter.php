@@ -93,11 +93,11 @@ class DatabaseAdapter extends AbstractAdapter
         return $this;
     }
 
-    public function get(array $parameters = []): Collection
+    public function get(array $parameters = []): array
     {
         $this->callParameterMethods($parameters);
 
-        return $this->collect($this->query->get());
+        return $this->query->get()->all();
     }
 
     public function count(array $parameters = []): int
@@ -150,11 +150,6 @@ class DatabaseAdapter extends AbstractAdapter
     public function truncate(): void
     {
         $this->query->truncate();
-    }
-
-    protected function make($entry): EntryInterface
-    {
-        return $this->newInstance((array) $entry);
     }
 
     public function __call($method, $arguments = [])

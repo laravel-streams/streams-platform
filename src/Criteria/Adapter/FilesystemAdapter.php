@@ -65,13 +65,13 @@ class FilesystemAdapter extends AbstractAdapter
         return $this;
     }
 
-    public function get(array $parameters = []): Collection
+    public function get(array $parameters = []): array
     {
         $this->query = $this->collect($this->disk->allFiles());
 
         $this->callParameterMethods($parameters);
 
-        return $this->query;
+        return $this->query->all();
     }
 
     public function count(array $parameters = []): int

@@ -3,7 +3,6 @@
 namespace Streams\Core\Criteria\Contract;
 
 use Illuminate\Support\Collection;
-use Streams\Core\Entry\Contract\EntryInterface;
 
 interface AdapterInterface
 {
@@ -51,9 +50,9 @@ interface AdapterInterface
      * Get the criteria results.
      * 
      * @param array $parameters
-     * @return Collection
+     * @return array
      */
-    public function get(array $parameters = []): Collection;
+    public function get(array $parameters = []): array;
 
     /**
      * Count the criteria results.
@@ -84,12 +83,4 @@ interface AdapterInterface
      * @return void
      */
     public function truncate();
-
-    /**
-     * Return a new entry instance.
-     *
-     * @param array $attributes
-     * @return EntryInterface
-     */
-    public function newInstance(array $attributes = []);
 }

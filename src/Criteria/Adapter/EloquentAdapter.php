@@ -120,11 +120,11 @@ class EloquentAdapter extends AbstractAdapter
         return $this;
     }
 
-    public function get(array $parameters = []): Collection
+    public function get(array $parameters = []): array
     {
         $this->callParameterMethods($parameters);
 
-        return $this->collect($this->query->get());
+        return $this->query->get()->all();
     }
 
     public function count(array $parameters = []): int
