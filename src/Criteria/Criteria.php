@@ -150,10 +150,12 @@ class Criteria
             }));
         }
 
-        $results = $this->eagerLoadRelations($this->collect($this->adapter->get($this->parameters)));
-
+        $results = $this->eagerLoadRelations(
+            $this->collect($this->adapter->get($this->parameters))
+        );
+        
         $this->parameters = [];
-
+        
         return $results;
     }
 
@@ -375,9 +377,9 @@ class Criteria
         }
 
         $offset = $page * $perPage - $perPage;
-
+        
         $entries = $this->limit($perPage, $offset)->get();
-
+        
         if ($simple) {
 
             $paginator = new SimplePaginator(

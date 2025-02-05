@@ -4,8 +4,6 @@ namespace Streams\Core\Criteria\Adapter;
 
 use Illuminate\Support\Str;
 use Streams\Core\Stream\Stream;
-use Illuminate\Support\Collection;
-use Streams\Core\Entry\Contract\EntryInterface;
 
 class EloquentAdapter extends AbstractAdapter
 {
@@ -15,11 +13,7 @@ class EloquentAdapter extends AbstractAdapter
     {
         $this->stream = $stream;
 
-        $model = $stream->config('source.model');
-
-        $stream->config('abstract', $model);
-
-        $this->query = (new $model)->newQuery();
+        $this->resetQuery();
     }
 
     public function orderBy($field, $direction = 'asc'): static
@@ -122,14 +116,14 @@ class EloquentAdapter extends AbstractAdapter
 
     public function get(array $parameters = []): array
     {
-        $this->callParameterMethods($parameters);
+        $this->resetQuery()->callParameterMethods($parameters);
 
         return $this->query->get()->all();
     }
 
     public function count(array $parameters = []): int
     {
-        $this->callParameterMethods($parameters);
+        $this->resetQuery()->callParameterMethods($parameters);
 
         return $this->query->count();
     }
@@ -147,7 +141,7 @@ class EloquentAdapter extends AbstractAdapter
 
     public function delete(array $parameters = []): bool
     {
-        $this->callParameterMethods($parameters);
+        $this->resetQuery()->callParameterMethods($parameters);
 
         return $this->query->delete();
     }
@@ -157,30 +151,24 @@ class EloquentAdapter extends AbstractAdapter
         $this->query->truncate();
     }
 
-    public function toRawSql(): string
-    {
-        return $this->query->toRawSql();
-    }
-
-    protected function make($entry): EntryInterface
-    {
-        return $entry;
-    }
-
-    public function newInstance(array $attributes = []): EntryInterface
+    protected function resetQuery(): static
     {
         $model = $this->stream->config('source.model');
 
-        $this->fillDefaults($attributes);
+        $this->query = (new $model)->newQuery();
 
-        $model = new $model($attributes);
-
-        return $model;
+        return $this;
     }
 
     public function __call($method, $arguments = [])
     {
-        $this->query = $this->query->$method(...$arguments);
+        $result = $this->query->$method(...$arguments);
+
+        if (is_string($result)) {
+            return $result;
+        }
+
+        $this->query = $result;
 
         return $this;
     }
