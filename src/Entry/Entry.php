@@ -55,7 +55,7 @@ class Entry implements
 
     public function getIdAttribute()
     {
-        $name = $this->stream()->config('key_name', 'id');
+        $name = $this->stream()->config('key_name', 'id') ?? 'id';
 
         $value = $this->__prototype['attributes'][$name] ?? $this->getPrototypeAttributeDefault($name);
 
